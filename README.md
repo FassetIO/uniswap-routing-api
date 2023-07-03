@@ -1,3 +1,20 @@
+
+ ---- **Fasset Info Start** ----
+## Build Steps
+
+This repo is forked from uniswap. Deploy it in US-EAST-2 and call the endpoints from wallet-api. 
+Goal is to stay in sync with the base repo without making too many changes in this code. 
+
+Pushing or updating to main will trigger code build. 
+Currently it deploys to non-prod for testing and later we will update the [buildspec/build.yml](./buildspec/build.yml) to deploy in prod. 
+
+Note: 
+1. cdk bootstrap has hardcoded arn `683031685817` for non-prod. 
+2. `INITIAL_RUN_BOOTSTRAP` is defined in non-prod as `/prod/general/uniswap-routing-api/...`
+3. Change `INITIAL_RUN_BOOTSTRAP` to `false` after first run
+
+---- **Fasset Info End** ----
+
 # Uniswap Routing API
 
 This repository contains routing API for the Uniswap V3 protocol.
