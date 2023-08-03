@@ -1,9 +1,7 @@
 import { ChainId } from '@uniswap/sdk-core'
 import * as cdk from 'aws-cdk-lib'
 import { CfnOutput, SecretValue, Stack, StackProps, Stage, StageProps } from 'aws-cdk-lib'
-import * as chatbot from 'aws-cdk-lib/aws-chatbot'
 import { BuildEnvironmentVariableType } from 'aws-cdk-lib/aws-codebuild'
-import { PipelineNotificationEvents } from 'aws-cdk-lib/aws-codepipeline'
 import * as sm from 'aws-cdk-lib/aws-secretsmanager'
 import { CodeBuildStep, CodePipeline, CodePipelineSource } from 'aws-cdk-lib/pipelines'
 import { Construct } from 'constructs'
@@ -158,33 +156,12 @@ export class RoutingAPIPipeline extends Stack {
       jsonRpcProviders[key] = jsonRpcProvidersSecret.secretValueFromJson(key).toString()
     })
 
-    // Beta us-east-2
-    const betaUsEast2Stage = new RoutingAPIStage(this, 'beta-us-east-2', {
-      env: { account: '145079444317', region: 'us-east-2' },
-      jsonRpcProviders: jsonRpcProviders,
-      internalApiKey: internalApiKey.secretValue.toString(),
-      provisionedConcurrency: 100,
-      ethGasStationInfoUrl: ethGasStationInfoUrl.secretValue.toString(),
-      stage: STAGE.BETA,
-      route53Arn: route53Arn.secretValueFromJson('arn').toString(),
-      pinata_key: pinataApi.secretValueFromJson('pinata-api-key').toString(),
-      pinata_secret: pinataSecret.secretValueFromJson('secret').toString(),
-      hosted_zone: hostedZone.secretValueFromJson('zone').toString(),
-      tenderlyUser: tenderlyCreds.secretValueFromJson('tenderly-user').toString(),
-      tenderlyProject: tenderlyCreds.secretValueFromJson('tenderly-project').toString(),
-      tenderlyAccessKey: tenderlyCreds.secretValueFromJson('tenderly-access-key').toString(),
-    })
-
-    const betaUsEast2AppStage = pipeline.addStage(betaUsEast2Stage)
-
-    this.addIntegTests(code, betaUsEast2Stage, betaUsEast2AppStage)
-
     // Prod us-east-2
     const prodUsEast2Stage = new RoutingAPIStage(this, 'prod-us-east-2', {
       env: { account: '606857263320', region: 'us-east-2' },
       jsonRpcProviders: jsonRpcProviders,
       internalApiKey: internalApiKey.secretValue.toString(),
-      provisionedConcurrency: 100,
+      provisionedConcurrency: 4, // changed from 100 because it'll cost too much and we don't need this many lambdas
       ethGasStationInfoUrl: ethGasStationInfoUrl.secretValue.toString(),
       chatbotSNSArn: 'arn:aws:sns:us-east-2:644039819003:SlackChatbotTopic',
       stage: STAGE.PROD,
@@ -201,16 +178,7 @@ export class RoutingAPIPipeline extends Stack {
 
     this.addIntegTests(code, prodUsEast2Stage, prodUsEast2AppStage)
 
-    const slackChannel = chatbot.SlackChannelConfiguration.fromSlackChannelConfigurationArn(
-      this,
-      'SlackChannel',
-      'arn:aws:chatbot::644039819003:chat-configuration/slack-channel/eng-ops-slack-chatbot'
-    )
-
     pipeline.buildPipeline()
-    pipeline.pipeline.notifyOn('NotifySlack', slackChannel, {
-      events: [PipelineNotificationEvents.PIPELINE_EXECUTION_FAILED],
-    })
   }
 
   private addIntegTests(
