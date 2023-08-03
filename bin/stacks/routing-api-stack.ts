@@ -13,7 +13,6 @@ import * as aws_waf from 'aws-cdk-lib/aws-wafv2'
 import { Construct } from 'constructs'
 import { STAGE } from '../../lib/util/stage'
 import { RoutingCachingStack } from './routing-caching-stack'
-import { RoutingDashboardStack } from './routing-dashboard-stack'
 import { RoutingLambdaStack } from './routing-lambda-stack'
 import { RoutingDatabaseStack } from './routing-database-stack'
 
@@ -61,25 +60,22 @@ export class RoutingAPIStack extends cdk.Stack {
       tenderlyAccessKey,
     } = props
 
-    const {
-      poolCacheBucket,
-      poolCacheBucket2,
-      poolCacheKey,
-      poolCacheLambdaNameArray,
-      tokenListCacheBucket,
-      ipfsPoolCachingLambda,
-    } = new RoutingCachingStack(this, 'RoutingCachingStack', {
-      chatbotSNSArn,
-      stage,
-      route53Arn,
-      pinata_key,
-      pinata_secret,
-      hosted_zone,
-    })
+    const { poolCacheBucket, poolCacheBucket2, poolCacheKey, tokenListCacheBucket } = new RoutingCachingStack(
+      this,
+      'RoutingCachingStack',
+      {
+        chatbotSNSArn,
+        stage,
+        route53Arn,
+        pinata_key,
+        pinata_secret,
+        hosted_zone,
+      }
+    )
 
     const { cachedRoutesDynamoDb, cachedV3PoolsDynamoDb } = new RoutingDatabaseStack(this, 'RoutingDatabaseStack', {})
 
-    const { routingLambda, routingLambdaAlias } = new RoutingLambdaStack(this, 'RoutingLambdaStack', {
+    const { routingLambdaAlias } = new RoutingLambdaStack(this, 'RoutingLambdaStack', {
       poolCacheBucket,
       poolCacheBucket2,
       poolCacheKey,
@@ -198,13 +194,6 @@ export class RoutingAPIStack extends cdk.Stack {
     new aws_waf.CfnWebACLAssociation(this, 'RoutingAPIIPThrottlingAssociation', {
       resourceArn: apiArn,
       webAclArn: ipThrottlingACL.getAtt('Arn').toString(),
-    })
-
-    new RoutingDashboardStack(this, 'RoutingDashboardStack', {
-      apiName: api.restApiName,
-      routingLambdaName: routingLambda.functionName,
-      poolCacheLambdaNameArray,
-      ipfsPoolCacheLambdaName: ipfsPoolCachingLambda ? ipfsPoolCachingLambda.functionName : undefined,
     })
 
     const lambdaIntegration = new aws_apigateway.LambdaIntegration(routingLambdaAlias)
