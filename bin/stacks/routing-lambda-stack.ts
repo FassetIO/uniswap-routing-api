@@ -63,7 +63,6 @@ export class RoutingLambdaStack extends cdk.NestedStack {
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchLambdaInsightsExecutionRolePolicy'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXRayDaemonWriteAccess'),
-        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaVPCAccessExecutionRole'),
       ],
     })
     poolCacheBucket.grantRead(lambdaRole)
@@ -114,6 +113,10 @@ export class RoutingLambdaStack extends cdk.NestedStack {
       tracing: aws_lambda.Tracing.ACTIVE,
       logRetention: RetentionDays.TWO_WEEKS,
     })
+
+    this.routingLambda.role?.addManagedPolicy(
+      aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')
+    )
 
     const lambdaAlarmErrorRate = new aws_cloudwatch.Alarm(this, 'RoutingAPI-LambdaErrorRate', {
       metric: new aws_cloudwatch.MathExpression({
