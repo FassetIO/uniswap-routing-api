@@ -129,7 +129,7 @@ export class RoutingAPIStack extends cdk.Stack {
           resources: ['execute-api:/*/*/*'],
           conditions: {
             StringNotEquals: {
-              'aws:SourceVpc': vpc,
+              'aws:SourceVpc': vpc.vpcId,
             },
           },
         }),
