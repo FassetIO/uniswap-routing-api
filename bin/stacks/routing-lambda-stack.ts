@@ -28,6 +28,9 @@ export interface RoutingLambdaStackProps extends cdk.NestedStackProps {
   chatbotSNSArn?: string
   cachedRoutesDynamoDb?: aws_dynamodb.Table
   cachedV3PoolsDynamoDb?: aws_dynamodb.Table
+  vpc?: cdk.aws_ec2.IVpc
+  subnetFilters?: cdk.aws_ec2.SubnetFilter[]
+  securityGroup?: cdk.aws_ec2.ISecurityGroup
 }
 export class RoutingLambdaStack extends cdk.NestedStack {
   public readonly routingLambda: aws_lambda_nodejs.NodejsFunction
@@ -49,6 +52,9 @@ export class RoutingLambdaStack extends cdk.NestedStack {
       tenderlyAccessKey,
       cachedRoutesDynamoDb,
       cachedV3PoolsDynamoDb,
+      vpc,
+      subnetFilters,
+      securityGroup,
     } = props
 
     const lambdaRole = new aws_iam.Role(this, 'RoutingLambdaRole', {
@@ -57,6 +63,7 @@ export class RoutingLambdaStack extends cdk.NestedStack {
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchLambdaInsightsExecutionRolePolicy'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXRayDaemonWriteAccess'),
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaVPCAccessExecutionRole'),
       ],
     })
     poolCacheBucket.grantRead(lambdaRole)
@@ -74,6 +81,9 @@ export class RoutingLambdaStack extends cdk.NestedStack {
       handler: 'quoteHandler',
       timeout: cdk.Duration.seconds(29),
       memorySize: 1024,
+      vpc: vpc,
+      vpcSubnets: { subnetFilters: subnetFilters },
+      securityGroups: securityGroup ? [securityGroup] : undefined,
       bundling: {
         minify: true,
         sourceMap: true,

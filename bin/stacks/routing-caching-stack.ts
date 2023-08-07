@@ -24,6 +24,9 @@ export interface RoutingCachingStackProps extends cdk.NestedStackProps {
   pinata_secret?: string
   hosted_zone?: string
   chatbotSNSArn?: string
+  vpc?: cdk.aws_ec2.IVpc
+  subnetFilters?: cdk.aws_ec2.SubnetFilter[]
+  securityGroup?: cdk.aws_ec2.ISecurityGroup
 }
 
 export class RoutingCachingStack extends cdk.NestedStack {
@@ -62,13 +65,14 @@ export class RoutingCachingStack extends cdk.NestedStack {
 
     this.poolCacheKey = 'poolCache.json'
 
-    const { stage, route53Arn, pinata_key, pinata_secret, hosted_zone } = props
+    const { stage, route53Arn, pinata_key, pinata_secret, hosted_zone, vpc, subnetFilters, securityGroup } = props
 
     const lambdaRole = new aws_iam.Role(this, 'RoutingLambdaRole', {
       assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchFullAccess'),
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaVPCAccessExecutionRole'),
       ],
     })
 
@@ -103,6 +107,9 @@ export class RoutingCachingStack extends cdk.NestedStack {
           handler: 'handler',
           timeout: Duration.seconds(900),
           memorySize: 1024,
+          vpc: vpc,
+          vpcSubnets: { subnetFilters: subnetFilters },
+          securityGroups: securityGroup ? [securityGroup] : undefined,
           bundling: {
             minify: true,
             sourceMap: true,
@@ -173,6 +180,9 @@ export class RoutingCachingStack extends cdk.NestedStack {
         handler: 'handler',
         timeout: Duration.seconds(900),
         memorySize: 1024,
+        vpc: vpc,
+        vpcSubnets: { subnetFilters: subnetFilters },
+        securityGroups: securityGroup ? [securityGroup] : undefined,
         bundling: {
           minify: true,
           sourceMap: true,
@@ -208,6 +218,9 @@ export class RoutingCachingStack extends cdk.NestedStack {
         handler: 'handler',
         timeout: Duration.seconds(900),
         memorySize: 512,
+        vpc: vpc,
+        vpcSubnets: { subnetFilters: subnetFilters },
+        securityGroups: securityGroup ? [securityGroup] : undefined,
         bundling: {
           minify: true,
           sourceMap: true,
@@ -259,6 +272,9 @@ export class RoutingCachingStack extends cdk.NestedStack {
       handler: 'handler',
       timeout: Duration.seconds(180),
       memorySize: 256,
+      vpc: vpc,
+      vpcSubnets: { subnetFilters: subnetFilters },
+      securityGroups: securityGroup ? [securityGroup] : undefined,
       bundling: {
         minify: true,
         sourceMap: true,
