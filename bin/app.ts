@@ -10,6 +10,7 @@ import 'source-map-support/register'
 import { SUPPORTED_CHAINS } from '../lib/handlers/injector-sor'
 import { STAGE } from '../lib/util/stage'
 import { RoutingAPIStack } from './stacks/routing-api-stack'
+import { baseEnvironmentConfig } from './config'
 dotenv.config()
 
 export class RoutingAPIStage extends Stage {
@@ -240,6 +241,11 @@ const jsonRpcProviders = {
   WEB3_RPC_43114: process.env.JSON_RPC_PROVIDER_43114!,
 }
 
+const envName = process.env.ENV_NAME!
+const baseEnvConfig = baseEnvironmentConfig(envName)
+const awsAccountId = baseEnvConfig.awsAccountId
+const awsRegion = baseEnvConfig.awsRegion
+
 // Local dev stack
 new RoutingAPIStack(app, 'RoutingAPIStack', {
   jsonRpcProviders: jsonRpcProviders,
@@ -256,6 +262,8 @@ new RoutingAPIStack(app, 'RoutingAPIStack', {
   tenderlyUser: process.env.TENDERLY_USER!,
   tenderlyProject: process.env.TENDERLY_PROJECT!,
   tenderlyAccessKey: process.env.TENDERLY_ACCESS_KEY!,
+  // TODO: review account id effect in next deployment
+  env: { account: awsAccountId, region: awsRegion },
 })
 
 new RoutingAPIPipeline(app, 'RoutingAPIPipelineStack', {

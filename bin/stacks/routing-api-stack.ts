@@ -1,7 +1,7 @@
 import { SUPPORTED_CHAINS } from '@uniswap/smart-order-router'
 import * as cdk from 'aws-cdk-lib'
 import { ChainId } from '@uniswap/sdk-core'
-import { CfnOutput, Duration } from 'aws-cdk-lib'
+import { CfnOutput, Duration, aws_ec2 as ec2 } from 'aws-cdk-lib'
 import * as aws_apigateway from 'aws-cdk-lib/aws-apigateway'
 import { MethodLoggingLevel } from 'aws-cdk-lib/aws-apigateway'
 import * as aws_cloudwatch from 'aws-cdk-lib/aws-cloudwatch'
@@ -15,6 +15,9 @@ import { STAGE } from '../../lib/util/stage'
 import { RoutingCachingStack } from './routing-caching-stack'
 import { RoutingLambdaStack } from './routing-lambda-stack'
 import { RoutingDatabaseStack } from './routing-database-stack'
+import { CDKContext, environmentConfig } from '../config'
+
+const envName = process.env.ENV_NAME!
 
 export const CHAINS_NOT_MONITORED: ChainId[] = [ChainId.GOERLI, ChainId.POLYGON_MUMBAI]
 
@@ -43,8 +46,21 @@ export class RoutingAPIStack extends cdk.Stack {
   ) {
     super(parent, name, props)
 
+    const envConfig: CDKContext = environmentConfig(this, envName)
+    const jsonRpcProviders = envConfig.environment.jsonRpcProviders
+
+    const vpcId = envConfig.vpcId
+    const defaultSGId = envConfig.defaultSGId
+    const vpcPrivateSubnets = envConfig.vpcPrivateSubnets
+
+    const vpc = ec2.Vpc.fromLookup(this, 'ImportVPC', {
+      isDefault: false,
+      vpcId: vpcId,
+    })
+    const subnetFilters = [ec2.SubnetFilter.byIds(vpcPrivateSubnets)]
+    const defaultSG = ec2.SecurityGroup.fromLookupById(this, 'DefaultSG', defaultSGId)
+
     const {
-      jsonRpcProviders,
       provisionedConcurrency,
       throttlingOverride,
       ethGasStationInfoUrl,
@@ -70,6 +86,9 @@ export class RoutingAPIStack extends cdk.Stack {
         pinata_key,
         pinata_secret,
         hosted_zone,
+        vpc,
+        subnetFilters,
+        securityGroup: defaultSG,
       }
     )
 
@@ -89,6 +108,9 @@ export class RoutingAPIStack extends cdk.Stack {
       tenderlyAccessKey,
       cachedRoutesDynamoDb,
       cachedV3PoolsDynamoDb,
+      vpc,
+      subnetFilters,
+      securityGroup: defaultSG,
     })
 
     const accessLogGroup = new aws_logs.LogGroup(this, 'RoutingAPIGAccessLogs')
@@ -110,6 +132,9 @@ export class RoutingAPIStack extends cdk.Stack {
           protocol: true,
           responseLength: true,
         }),
+      },
+      endpointConfiguration: {
+        types: [aws_apigateway.EndpointType.PRIVATE],
       },
       defaultCorsPreflightOptions: {
         allowOrigins: aws_apigateway.Cors.ALL_ORIGINS,
@@ -154,7 +179,7 @@ export class RoutingAPIStack extends cdk.Stack {
                     byteMatchStatement: {
                       fieldToMatch: {
                         singleHeader: {
-                          name: 'x-api-key',
+                          Name: 'x-api-key',
                         },
                       },
                       positionalConstraint: 'EXACTLY',
