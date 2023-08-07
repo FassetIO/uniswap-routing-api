@@ -127,6 +127,9 @@ export class RoutingCachingStack extends cdk.NestedStack {
           },
         }
       )
+      lambda.role?.addManagedPolicy(
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')
+      )
       new aws_events.Rule(this, `SchedulePoolCache-ChainId${chainId}-Protocol${protocol}`, {
         schedule: aws_events.Schedule.rate(Duration.minutes(15)),
         targets: [new aws_events_targets.LambdaFunction(lambda)],
@@ -206,6 +209,10 @@ export class RoutingCachingStack extends cdk.NestedStack {
         },
       })
 
+      this.ipfsPoolCachingLambda.role?.addManagedPolicy(
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')
+      )
+
       new aws_events.Rule(this, 'ScheduleIpfsPoolCache', {
         schedule: aws_events.Schedule.rate(Duration.minutes(15)),
         targets: [new aws_events_targets.LambdaFunction(this.ipfsPoolCachingLambda)],
@@ -241,6 +248,10 @@ export class RoutingCachingStack extends cdk.NestedStack {
           REDEPLOY: '1',
         },
       })
+
+      this.ipfsCleanPoolCachingLambda.role?.addManagedPolicy(
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')
+      )
 
       new aws_events.Rule(this, 'ScheduleCleanIpfsPoolCache', {
         schedule: aws_events.Schedule.rate(Duration.minutes(30)),
@@ -292,6 +303,10 @@ export class RoutingCachingStack extends cdk.NestedStack {
         TOKEN_LIST_CACHE_BUCKET: this.tokenListCacheBucket.bucketName,
       },
     })
+
+    tokenListCachingLambda.role?.addManagedPolicy(
+      aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')
+    )
 
     this.tokenListCacheBucket.grantReadWrite(tokenListCachingLambda)
 

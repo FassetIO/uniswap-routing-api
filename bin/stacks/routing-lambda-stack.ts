@@ -115,6 +115,10 @@ export class RoutingLambdaStack extends cdk.NestedStack {
       logRetention: RetentionDays.TWO_WEEKS,
     })
 
+    this.routingLambda.role?.addManagedPolicy(
+      aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')
+    )
+
     const lambdaAlarmErrorRate = new aws_cloudwatch.Alarm(this, 'RoutingAPI-LambdaErrorRate', {
       metric: new aws_cloudwatch.MathExpression({
         expression: 'errors / invocations',
