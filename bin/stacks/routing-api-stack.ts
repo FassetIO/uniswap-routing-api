@@ -115,6 +115,27 @@ export class RoutingAPIStack extends cdk.Stack {
 
     const accessLogGroup = new aws_logs.LogGroup(this, 'RoutingAPIGAccessLogs')
 
+    const apiResourcePolicy = new cdk.aws_iam.PolicyDocument({
+      statements: [
+        new cdk.aws_iam.PolicyStatement({
+          actions: ['execute-api:Invoke'],
+          principals: [new cdk.aws_iam.AnyPrincipal()],
+          resources: ['execute-api:/*/*/*'],
+        }),
+        new cdk.aws_iam.PolicyStatement({
+          effect: cdk.aws_iam.Effect.DENY,
+          principals: [new cdk.aws_iam.AnyPrincipal()],
+          actions: ['execute-api:Invoke'],
+          resources: ['execute-api:/*/*/*'],
+          conditions: {
+            StringNotEquals: {
+              'aws:SourceVpc': vpc,
+            },
+          },
+        }),
+      ],
+    })
+
     const api = new aws_apigateway.RestApi(this, 'routing-api', {
       restApiName: 'Routing API',
       deployOptions: {
@@ -140,6 +161,7 @@ export class RoutingAPIStack extends cdk.Stack {
         allowOrigins: aws_apigateway.Cors.ALL_ORIGINS,
         allowMethods: aws_apigateway.Cors.ALL_METHODS,
       },
+      policy: apiResourcePolicy,
     })
 
     const ipThrottlingACL = new aws_waf.CfnWebACL(this, 'RoutingAPIIPThrottlingACL', {
