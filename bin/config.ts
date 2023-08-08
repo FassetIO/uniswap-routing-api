@@ -28,6 +28,8 @@ function getEnvironmentVariables(scope: Construct, env: string) {
     TENDERLY_USER: '',
     TENDERLY_PROJECT: '',
     TENDERLY_ACCESS_KEY: '',
+    // TODO: read from secrets manager
+    API_KEY: getParameter(scope, `/${env}/general/wallet-api/ROUTING_API_KEY`),
   }
 }
 
