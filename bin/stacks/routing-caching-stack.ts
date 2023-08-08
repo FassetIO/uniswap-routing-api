@@ -72,7 +72,6 @@ export class RoutingCachingStack extends cdk.NestedStack {
       managedPolicies: [
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchFullAccess'),
-        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaVPCAccessExecutionRole'),
       ],
     })
 
