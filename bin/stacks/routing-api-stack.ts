@@ -48,6 +48,7 @@ export class RoutingAPIStack extends cdk.Stack {
 
     const envConfig: CDKContext = environmentConfig(this, envName)
     const jsonRpcProviders = envConfig.environment.jsonRpcProviders
+    const routingAPIKey = envConfig.environment.API_KEY
 
     const vpcId = envConfig.vpcId
     const defaultSGId = envConfig.defaultSGId
@@ -163,6 +164,21 @@ export class RoutingAPIStack extends cdk.Stack {
       },
       policy: apiResourcePolicy,
     })
+
+    const apiKey = api.addApiKey('RoutingApiKey', {
+      apiKeyName: 'routing-api-key',
+      value: routingAPIKey,
+      description: `Uniswap routing API key `,
+    })
+
+    const usagePlan = api.addUsagePlan('RoutingApiPlan', {
+      name: 'RoutingApiPlan',
+      apiStages: [{ api: api, stage: api.deploymentStage }],
+      throttle: { burstLimit: 500, rateLimit: 1000 },
+      quota: { limit: 10000000, period: aws_apigateway.Period.MONTH },
+    })
+
+    usagePlan.addApiKey(apiKey)
 
     const ipThrottlingACL = new aws_waf.CfnWebACL(this, 'RoutingAPIIPThrottlingACL', {
       defaultAction: { allow: {} },
