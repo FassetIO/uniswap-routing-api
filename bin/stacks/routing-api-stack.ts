@@ -266,6 +266,9 @@ export class RoutingAPIStack extends cdk.Stack {
         allowOrigins: aws_apigateway.Cors.ALL_ORIGINS,
         allowMethods: aws_apigateway.Cors.ALL_METHODS,
       },
+      defaultMethodOptions: {
+        apiKeyRequired: true,
+      },
     })
     quote.addMethod('GET', lambdaIntegration, {
       apiKeyRequired: true,
