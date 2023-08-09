@@ -267,7 +267,9 @@ export class RoutingAPIStack extends cdk.Stack {
         allowMethods: aws_apigateway.Cors.ALL_METHODS,
       },
     })
-    quote.addMethod('GET', lambdaIntegration)
+    quote.addMethod('GET', lambdaIntegration, {
+      apiKeyRequired: true,
+    })
 
     // All alarms default to GreaterThanOrEqualToThreshold for when to be triggered.
     const apiAlarm5xxSev2 = new aws_cloudwatch.Alarm(this, 'RoutingAPI-SEV2-5XXAlarm', {
