@@ -60,6 +60,11 @@ export class RoutingAPIStack extends cdk.Stack {
     })
     const subnetFilters = [ec2.SubnetFilter.byIds(vpcPrivateSubnets)]
     const defaultSG = ec2.SecurityGroup.fromLookupById(this, 'DefaultSG', defaultSGId)
+    const vpcEndpoint = vpc.addInterfaceEndpoint('routing-api-vpc-endpoint', {
+      service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY,
+      subnets: { subnetFilters },
+      securityGroups: [defaultSG],
+    })
 
     const {
       provisionedConcurrency,
@@ -130,7 +135,7 @@ export class RoutingAPIStack extends cdk.Stack {
           resources: ['execute-api:/*/*/*'],
           conditions: {
             StringNotEquals: {
-              'aws:SourceVpc': vpc.vpcId,
+              'aws:SourceVpce': vpcEndpoint.vpcEndpointId,
             },
           },
         }),
@@ -157,6 +162,7 @@ export class RoutingAPIStack extends cdk.Stack {
       },
       endpointConfiguration: {
         types: [aws_apigateway.EndpointType.PRIVATE],
+        vpcEndpoints: [vpcEndpoint],
       },
       defaultCorsPreflightOptions: {
         allowOrigins: aws_apigateway.Cors.ALL_ORIGINS,
