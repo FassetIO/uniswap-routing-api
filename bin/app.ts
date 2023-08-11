@@ -262,7 +262,6 @@ new RoutingAPIStack(app, 'RoutingAPIStack', {
   tenderlyUser: process.env.TENDERLY_USER!,
   tenderlyProject: process.env.TENDERLY_PROJECT!,
   tenderlyAccessKey: process.env.TENDERLY_ACCESS_KEY!,
-  // TODO: review account id effect in next deployment
   env: { account: awsAccountId, region: awsRegion },
 })
 

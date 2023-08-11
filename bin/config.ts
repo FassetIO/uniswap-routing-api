@@ -1,4 +1,5 @@
 import * as ssm from 'aws-cdk-lib/aws-ssm'
+import * as sm from 'aws-cdk-lib/aws-secretsmanager'
 import { Construct } from 'constructs'
 
 const REGION = 'us-east-2'
@@ -6,8 +7,15 @@ const REGION = 'us-east-2'
 const getParameter = (scope: Construct, name: string): string => {
   return ssm.StringParameter.valueForStringParameter(scope, name)
 }
+const getSecret = (scope: Construct, secretArn: string) => {
+  return sm.Secret.fromSecretCompleteArn(scope, `RoutingApiSecret`, secretArn)
+}
 
-function getEnvironmentVariables(scope: Construct, env: string) {
+const getSecretParameterValue = (secret: sm.ISecret, keyName: string) => {
+  return secret.secretValueFromJson(keyName)
+}
+
+function getEnvironmentVariables(scope: Construct, env: string, secret: sm.ISecret) {
   return {
     // TODO: use secrets manager for provider keys
     jsonRpcProviders: {
@@ -28,8 +36,7 @@ function getEnvironmentVariables(scope: Construct, env: string) {
     TENDERLY_USER: '',
     TENDERLY_PROJECT: '',
     TENDERLY_ACCESS_KEY: '',
-    // TODO: read from secrets manager
-    API_KEY: getParameter(scope, `/${env}/general/wallet-api/ROUTING_API_KEY`),
+    API_KEY: getSecretParameterValue(secret, 'API_KEY'),
   }
 }
 
@@ -70,31 +77,35 @@ export const baseEnvironmentConfig = (envName: string): BaseCDKContext => {
 }
 
 export const environmentConfig = (scope: Construct, envName: string): CDKContext => {
+  const devSecretArn = 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC'
+  const prodSecretArn = 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC'
+  const secret = getSecret(scope, envName === 'dev' ? devSecretArn : prodSecretArn)
+
   const environmentMapper: {
     [envName: string]: CDKContext
   } = {
     dev: {
       envName: envName,
       awsRegion: REGION,
-      secretArn: 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC',
+      secretArn: devSecretArn,
       vpcId: 'vpc-0bc90b7c6b50eeefe',
       defaultSGId: 'sg-0703e567213625a09',
       apiGatewaySGId: 'sg-08a0f283054f417fe',
       vpcPrivateSubnets: ['subnet-098bba581a811be27', 'subnet-02c391bd516da0e17'],
       environment: {
-        ...getEnvironmentVariables(scope, envName),
+        ...getEnvironmentVariables(scope, envName, secret),
       },
     },
     prod: {
       envName: envName,
       awsRegion: REGION,
-      secretArn: 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC',
+      secretArn: prodSecretArn,
       vpcId: 'vpc-0bc90b7c6b50eeefe',
       defaultSGId: 'sg-0703e567213625a09',
       apiGatewaySGId: 'sg-08a0f283054f417fe',
       vpcPrivateSubnets: ['subnet-098bba581a811be27', 'subnet-02c391bd516da0e17'],
       environment: {
-        ...getEnvironmentVariables(scope, envName),
+        ...getEnvironmentVariables(scope, envName, secret),
       },
     },
   }
