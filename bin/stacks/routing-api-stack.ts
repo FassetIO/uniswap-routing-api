@@ -52,6 +52,7 @@ export class RoutingAPIStack extends cdk.Stack {
 
     const vpcId = envConfig.vpcId
     const defaultSGId = envConfig.defaultSGId
+    const apiGatewaySGId = envConfig.apiGatewaySGId
     const vpcPrivateSubnets = envConfig.vpcPrivateSubnets
 
     const vpc = ec2.Vpc.fromLookup(this, 'ImportVPC', {
@@ -60,10 +61,11 @@ export class RoutingAPIStack extends cdk.Stack {
     })
     const subnetFilters = [ec2.SubnetFilter.byIds(vpcPrivateSubnets)]
     const defaultSG = ec2.SecurityGroup.fromLookupById(this, 'DefaultSG', defaultSGId)
+    const apiGatewaySG = ec2.SecurityGroup.fromLookupById(this, 'ApiGwVpceSG', apiGatewaySGId)
     const vpcEndpoint = vpc.addInterfaceEndpoint('routing-api-vpc-endpoint', {
       service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY,
       subnets: { subnetFilters },
-      securityGroups: [defaultSG],
+      securityGroups: [apiGatewaySG],
     })
 
     const {

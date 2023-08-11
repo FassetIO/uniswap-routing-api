@@ -45,6 +45,7 @@ export type CDKContext = {
   secretArn: string
   vpcId: string
   defaultSGId: string
+  apiGatewaySGId: string
   vpcPrivateSubnets: string[]
   environment: any
 }
@@ -78,6 +79,7 @@ export const environmentConfig = (scope: Construct, envName: string): CDKContext
       secretArn: 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC',
       vpcId: 'vpc-0bc90b7c6b50eeefe',
       defaultSGId: 'sg-0703e567213625a09',
+      apiGatewaySGId: 'sg-08a0f283054f417fe',
       vpcPrivateSubnets: ['subnet-098bba581a811be27', 'subnet-02c391bd516da0e17'],
       environment: {
         ...getEnvironmentVariables(scope, envName),
@@ -89,6 +91,7 @@ export const environmentConfig = (scope: Construct, envName: string): CDKContext
       secretArn: 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC',
       vpcId: 'vpc-0bc90b7c6b50eeefe',
       defaultSGId: 'sg-0703e567213625a09',
+      apiGatewaySGId: 'sg-08a0f283054f417fe',
       vpcPrivateSubnets: ['subnet-098bba581a811be27', 'subnet-02c391bd516da0e17'],
       environment: {
         ...getEnvironmentVariables(scope, envName),
