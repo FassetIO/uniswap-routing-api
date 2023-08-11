@@ -36,7 +36,7 @@ function getEnvironmentVariables(scope: Construct, env: string, secret: sm.ISecr
     TENDERLY_USER: '',
     TENDERLY_PROJECT: '',
     TENDERLY_ACCESS_KEY: '',
-    API_KEY: getSecretParameterValue(secret, 'API_KEY'),
+    API_KEY: getSecretParameterValue(secret, 'UNISWAP_ROUTING_API_KEY'),
   }
 }
 
