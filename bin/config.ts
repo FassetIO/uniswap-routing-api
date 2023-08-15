@@ -67,18 +67,17 @@ export const baseEnvironmentConfig = (envName: string): BaseCDKContext => {
       deployRoleArn: 'arn:aws:iam::683031685817:role/dev-CodebuildGlobal-role',
     },
     prod: {
-      // TODO: currently we only have dev deployment.
       awsRegion: REGION,
-      awsAccountId: '683031685817',
-      deployRoleArn: 'arn:aws:iam::683031685817:role/dev-CodebuildGlobal-role',
+      awsAccountId: '024147136615',
+      deployRoleArn: 'arn:aws:iam::024147136615:role/dev-CodebuildGlobal-role',
     },
   }
   return environmentMapper[envName]
 }
 
 export const environmentConfig = (scope: Construct, envName: string): CDKContext => {
-  const devSecretArn = 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC'
-  const prodSecretArn = 'arn:aws:secretsmanager:ap-southeast-3:683031685817:secret:dev-secret-wallet-api-I0DajC'
+  const devSecretArn = 'arn:aws:secretsmanager:us-east-2:683031685817:secret:dev-secrets-routing-api-VrvlNT'
+  const prodSecretArn = 'arn:aws:secretsmanager:us-east-2:024147136615:secret:prod-secrets-routing-api-RK3NWl'
   const secret = getSecret(scope, envName === 'dev' ? devSecretArn : prodSecretArn)
 
   const environmentMapper: {
@@ -100,10 +99,10 @@ export const environmentConfig = (scope: Construct, envName: string): CDKContext
       envName: envName,
       awsRegion: REGION,
       secretArn: prodSecretArn,
-      vpcId: 'vpc-0bc90b7c6b50eeefe',
-      defaultSGId: 'sg-0703e567213625a09',
-      apiGatewaySGId: 'sg-08a0f283054f417fe',
-      vpcPrivateSubnets: ['subnet-098bba581a811be27', 'subnet-02c391bd516da0e17'],
+      vpcId: 'vpc-06e4f5029845be060',
+      defaultSGId: 'sg-06dec9ed472921b74',
+      apiGatewaySGId: 'sg-0bc53924fe00cce07',
+      vpcPrivateSubnets: ['subnet-0d732ee2f48d5c0c7', 'subnet-04b36171ebf5b3356', 'subnet-0e2100dbc552b46b0'],
       environment: {
         ...getEnvironmentVariables(scope, envName, secret),
       },
