@@ -87,7 +87,9 @@ export class RoutingLambdaStack extends cdk.NestedStack {
         minify: true,
         sourceMap: true,
       },
-      description: 'Routing Lambda',
+      // adding this to bypass version already exists error
+      // https://github.com/aws/aws-cdk/issues/5334
+      description: `Routing Lambda - Generated on: ${new Date().toISOString()}`,
       environment: {
         VERSION: '5',
         NODE_OPTIONS: '--enable-source-maps',
