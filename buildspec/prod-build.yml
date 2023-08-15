@@ -1,0 +1,17 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 16
+    commands:
+      - npm install aws-cdk -g
+  pre_build:
+    commands:
+      - INITIAL_RUN_BOOTSTRAP=$(aws ssm get-parameter --name /prod/general/uniswap-routing-api/INITIAL_RUN_BOOTSTRAP --with-decryption --query "Parameter.{Value:Value}" --output text)
+  build:
+    commands:
+      - npm install -g aws-cdk
+      - npm install
+      - npm run build
+      - if [ "$INITIAL_RUN_BOOTSTRAP" = "true" ]; then ENV_NAME=prod cdk bootstrap aws://024147136615/us-east-2; fi
+      - ENV_NAME=prod cdk deploy RoutingAPIStack --require-approval never --verbose
