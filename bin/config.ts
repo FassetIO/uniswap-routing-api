@@ -20,17 +20,7 @@ function getEnvironmentVariables(scope: Construct, env: string, secret: sm.ISecr
     // TODO: use secrets manager for provider keys
     jsonRpcProviders: {
       WEB3_RPC_1: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_1`),
-      WEB3_RPC_3: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_3`),
-      WEB3_RPC_4: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_4`),
       WEB3_RPC_5: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_5`),
-      WEB3_RPC_42: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_42`),
-      WEB3_RPC_10: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_10`),
-      WEB3_RPC_69: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_69`),
-      WEB3_RPC_42161: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_42161`),
-      WEB3_RPC_421611: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_421611`),
-      WEB3_RPC_137: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_137`),
-      WEB3_RPC_80001: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_80001`),
-      WEB3_RPC_56: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_56`),
     },
     THROTTLE_PER_FIVE_MINS: '',
     TENDERLY_USER: '',
