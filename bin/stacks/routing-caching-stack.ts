@@ -19,6 +19,7 @@ import { STAGE } from '../../lib/util/stage'
 
 export interface RoutingCachingStackProps extends cdk.NestedStackProps {
   stage: string
+  cachingSchedule: number
   route53Arn?: string
   pinata_key?: string
   pinata_secret?: string
@@ -41,7 +42,8 @@ export class RoutingCachingStack extends cdk.NestedStack {
   constructor(scope: Construct, name: string, props: RoutingCachingStackProps) {
     super(scope, name, props)
 
-    const { chatbotSNSArn } = props
+    const { chatbotSNSArn, cachingSchedule } = props
+    const cacheCleaningSchedule = cachingSchedule * 2
 
     const chatBotTopic = chatbotSNSArn ? aws_sns.Topic.fromTopicArn(this, 'ChatbotTopic', chatbotSNSArn) : undefined
 
@@ -130,7 +132,7 @@ export class RoutingCachingStack extends cdk.NestedStack {
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaVPCAccessExecutionRole')
       )
       new aws_events.Rule(this, `SchedulePoolCache-ChainId${chainId}-Protocol${protocol}`, {
-        schedule: aws_events.Schedule.rate(Duration.minutes(15)),
+        schedule: aws_events.Schedule.rate(Duration.minutes(cachingSchedule)),
         targets: [new aws_events_targets.LambdaFunction(lambda)],
       })
       this.poolCacheBucket2.grantReadWrite(lambda)
@@ -213,7 +215,7 @@ export class RoutingCachingStack extends cdk.NestedStack {
       )
 
       new aws_events.Rule(this, 'ScheduleIpfsPoolCache', {
-        schedule: aws_events.Schedule.rate(Duration.minutes(15)),
+        schedule: aws_events.Schedule.rate(Duration.minutes(cachingSchedule)),
         targets: [new aws_events_targets.LambdaFunction(this.ipfsPoolCachingLambda)],
       })
 
@@ -253,7 +255,7 @@ export class RoutingCachingStack extends cdk.NestedStack {
       )
 
       new aws_events.Rule(this, 'ScheduleCleanIpfsPoolCache', {
-        schedule: aws_events.Schedule.rate(Duration.minutes(30)),
+        schedule: aws_events.Schedule.rate(Duration.minutes(cacheCleaningSchedule)),
         targets: [new aws_events_targets.LambdaFunction(this.ipfsCleanPoolCachingLambda)],
       })
     }
@@ -310,7 +312,7 @@ export class RoutingCachingStack extends cdk.NestedStack {
     this.tokenListCacheBucket.grantReadWrite(tokenListCachingLambda)
 
     new aws_events.Rule(this, 'ScheduleTokenListCache', {
-      schedule: aws_events.Schedule.rate(Duration.minutes(15)),
+      schedule: aws_events.Schedule.rate(Duration.minutes(cachingSchedule)),
       targets: [new aws_events_targets.LambdaFunction(tokenListCachingLambda)],
     })
   }
