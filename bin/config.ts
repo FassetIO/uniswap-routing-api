@@ -27,6 +27,7 @@ function getEnvironmentVariables(scope: Construct, env: string, secret: sm.ISecr
     TENDERLY_PROJECT: '',
     TENDERLY_ACCESS_KEY: '',
     API_KEY: getSecretParameterValue(secret, 'UNISWAP_ROUTING_API_KEY'),
+    CACHING_LAMBDA_SCHEDULE_MINS: getParameter(scope, `/${env}/general/wallet-api/CACHING_LAMBDA_SCHEDULE_MINS`),
   }
 }
 

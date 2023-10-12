@@ -54,6 +54,7 @@ export class RoutingAPIStack extends cdk.Stack {
     const defaultSGId = envConfig.defaultSGId
     const apiGatewaySGId = envConfig.apiGatewaySGId
     const vpcPrivateSubnets = envConfig.vpcPrivateSubnets
+    const routeCachingLambdaSchedule = parseInt(envConfig.environment.CACHING_LAMBDA_SCHEDULE_MINS) ?? 15
 
     const vpc = ec2.Vpc.fromLookup(this, 'ImportVPC', {
       isDefault: false,
@@ -97,6 +98,7 @@ export class RoutingAPIStack extends cdk.Stack {
         vpc,
         subnetFilters,
         securityGroup: defaultSG,
+        cachingSchedule: routeCachingLambdaSchedule,
       }
     )
 
