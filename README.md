@@ -1,16 +1,21 @@
+---- **_Fasset Info Start_** ----
 
- ---- **Fasset Info Start** ----
 ## Build Steps
 
-This repo is forked from uniswap. Deploy it in US-EAST-2 and call the endpoints from wallet-api. 
-Goal is to stay in sync with the base repo without making too many changes in this code. 
+This repo is forked from uniswap. Deploy it in US-EAST-2 and call the endpoints from wallet-api.
+Goal is to stay in sync with the base repo without making too many changes in this code.
 
-Pushing or updating to main will trigger code build. 
-Currently it deploys to non-prod for testing and later we will update the [buildspec/build.yml](./buildspec/build.yml) to deploy in prod. 
+Pushing or updating to main will trigger code build.
+Currently it deploys to non-prod and prod using triggers on main branch.
 
-Note: `INITIAL_RUN_BOOTSTRAP` is defined in non-prod as `/prod/general/uniswap-routing-api/...`
+### Generate templates locally
 
----- **Fasset Info End** ----
+```sh
+npm run build
+ENV_NAME=dev CACHING_LAMBDA_SCHEDULE_MINS=60 cdk synth
+```
+
+---- **_Fasset Info End_** ----
 
 # Uniswap Routing API
 
