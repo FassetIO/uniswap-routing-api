@@ -8,10 +8,11 @@ phases:
   pre_build:
     commands:
       - INITIAL_RUN_BOOTSTRAP=$(aws ssm get-parameter --name /dev/general/uniswap-routing-api/INITIAL_RUN_BOOTSTRAP --with-decryption --query "Parameter.{Value:Value}" --output text)
+      - CACHE_SCHEDULE=$(aws ssm get-parameter --name /dev/general/uniswap-routing-api/CACHING_LAMBDA_SCHEDULE_MINS --with-decryption --query "Parameter.{Value:Value}" --output text)
   build:
     commands:
       - npm install -g aws-cdk
       - npm install
       - npm run build
       - if [ "$INITIAL_RUN_BOOTSTRAP" = "true" ]; then ENV_NAME=dev cdk bootstrap aws://683031685817/us-east-2; fi
-      - ENV_NAME=dev cdk deploy RoutingAPIStack --require-approval never --verbose
+      - ENV_NAME=dev CACHING_LAMBDA_SCHEDULE_MINS=$CACHE_SCHEDULE cdk deploy RoutingAPIStack --require-approval never --verbose
