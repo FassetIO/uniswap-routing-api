@@ -8,7 +8,7 @@ phases:
   pre_build:
     commands:
       - INITIAL_RUN_BOOTSTRAP=$(aws ssm get-parameter --name /prod/general/uniswap-routing-api/INITIAL_RUN_BOOTSTRAP --with-decryption --query "Parameter.{Value:Value}" --output text)
-      - CACHE_SCHEDULE=$(aws ssm get-parameter --name /prod/general/uniswap-routing-api/CACHING_LAMBDA_SCHEDULE_MINS --with-decryption --query "Parameter.{Value:Value}" --output text)
+      - CACHE_SCHEDULE=$(aws ssm get-parameter --name /prod/general/wallet-api/CACHING_LAMBDA_SCHEDULE_MINS --with-decryption --query "Parameter.{Value:Value}" --output text)
   build:
     commands:
       - npm install -g aws-cdk
