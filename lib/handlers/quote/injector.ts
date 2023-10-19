@@ -35,7 +35,9 @@ export class QuoteHandlerInjector extends InjectorSOR<
     // All other requests will only log warnings and errors.
     // Note that we use WARN as a default rather than ERROR
     // to capture Tapcompare logs in the smart-order-router.
-    const logLevel = Math.random() < 0.1 ? bunyan.INFO : bunyan.WARN
+    // const logLevel = Math.random() < 0.1 ? bunyan.INFO : bunyan.WARN
+    /** XXX - for testing only */
+    const logLevel = bunyan.INFO
 
     const { tokenInAddress, tokenInChainId, tokenOutAddress, amount, type, algorithm, gasPriceWei } = requestQueryParams
 

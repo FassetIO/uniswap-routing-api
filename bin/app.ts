@@ -221,6 +221,7 @@ export class RoutingAPIPipeline extends Stack {
 
 const app = new cdk.App()
 
+/** these are overwritten in stack */
 const jsonRpcProviders = {
   WEB3_RPC_1: process.env.JSON_RPC_PROVIDER_1!,
   WEB3_RPC_3: process.env.JSON_RPC_PROVIDER_3!,

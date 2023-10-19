@@ -10,16 +10,8 @@ export const chainProtocols = [
     timeout: 90000,
     provider: new V3SubgraphProvider(ChainId.MAINNET, 3, 90000),
   },
-  {
-    protocol: Protocol.V3,
-    chainId: ChainId.GOERLI,
-    timeout: 90000,
-    provider: new V3SubgraphProvider(ChainId.GOERLI, 3, 90000),
-  },
 
-  /* 
-  XXX -  we're only using uniswap for Mainnet & Goerli
-  */
+  /** we're only using uniswap for Mainnet & Goerli for now */
 
   // {
   //   protocol: Protocol.V3,
@@ -59,11 +51,5 @@ export const chainProtocols = [
     chainId: ChainId.MAINNET,
     timeout: 840000,
     provider: new V2SubgraphProvider(ChainId.MAINNET, 3, 900000, true, 1000), // 1000 is the largest page size supported by thegraph
-  },
-  {
-    protocol: Protocol.V2,
-    chainId: ChainId.GOERLI,
-    timeout: 840000,
-    provider: new V2SubgraphProvider(ChainId.GOERLI, 3, 900000, true, 1000), // 1000 is the largest page size supported by thegraph
   },
 ]

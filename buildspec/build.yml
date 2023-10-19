@@ -9,12 +9,10 @@ phases:
     commands:
       - INITIAL_RUN_BOOTSTRAP=$(aws ssm get-parameter --name /dev/general/uniswap-routing-api/INITIAL_RUN_BOOTSTRAP --with-decryption --query "Parameter.{Value:Value}" --output text)
       - CACHE_SCHEDULE=$(aws ssm get-parameter --name /dev/general/wallet-api/CACHING_LAMBDA_SCHEDULE_MINS --with-decryption --query "Parameter.{Value:Value}" --output text)
-      - JSON_RPC_PROVIDER_1=$(aws ssm get-parameter --name /dev/general/wallet-api/JSON_RPC_PROVIDER_1 --with-decryption --query "Parameter.{Value:Value}" --output text)
-      - JSON_RPC_PROVIDER_5=$(aws ssm get-parameter --name /dev/general/wallet-api/JSON_RPC_PROVIDER_5 --with-decryption --query "Parameter.{Value:Value}" --output text)
   build:
     commands:
       - npm install -g aws-cdk
       - npm install
       - npm run build
       - if [ "$INITIAL_RUN_BOOTSTRAP" = "true" ]; then ENV_NAME=dev cdk bootstrap aws://683031685817/us-east-2; fi
-      - ENV_NAME=dev CACHING_LAMBDA_SCHEDULE_MINS=$CACHE_SCHEDULE JSON_RPC_PROVIDER_1=$JSON_RPC_PROVIDER_1 JSON_RPC_PROVIDER_5=$JSON_RPC_PROVIDER_5 cdk deploy RoutingAPIStack --require-approval never --verbose
+      - ENV_NAME=dev CACHING_LAMBDA_SCHEDULE_MINS=$CACHE_SCHEDULE cdk deploy RoutingAPIStack --require-approval never --verbose
