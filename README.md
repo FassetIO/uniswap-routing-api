@@ -41,6 +41,7 @@ The best way to develop and test the API is to deploy your own instance to AWS.
    # ROPSTEN = 3
    # RINKEBY = 4
    # GOERLI = 5
+   # SEPOLIA = 11155111
    # KOVAN = 42
    # OPTIMISM = 10
    # OPTIMISTIC_KOVAN = 69
