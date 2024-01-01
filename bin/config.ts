@@ -21,6 +21,7 @@ function getEnvironmentVariables(scope: Construct, env: string, secret: sm.ISecr
     jsonRpcProviders: {
       WEB3_RPC_1: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_1`),
       WEB3_RPC_5: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_5`),
+      WEB3_RPC_11155111: getParameter(scope, `/${env}/general/wallet-api/JSON_RPC_PROVIDER_11155111`),
     },
     THROTTLE_PER_FIVE_MINS: '',
     TENDERLY_USER: '',
